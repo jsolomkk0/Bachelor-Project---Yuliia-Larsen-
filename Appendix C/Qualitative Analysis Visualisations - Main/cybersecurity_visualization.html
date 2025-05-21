@@ -1,0 +1,515 @@
+
+    <!DOCTYPE html>
+<html>
+<head>
+    <title>Cybersecurity Pattern Labels Visualization</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: Arial, sans-serif;
+            background-color: #F5F5F5; 
+        }
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            border-radius: 5px;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 12px 16px;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+        .visualization {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+        .sticky-note {
+            position: absolute;
+            width: 180px;
+            height: 40px;
+            padding: 10px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 12px;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 1;
+            border-radius: 3px;
+        }
+        .sticky-note:hover {
+            z-index: 10;
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
+        }
+        .cluster-label {
+            position: absolute;
+            padding: 15px 20px;
+            background-color: white;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            transform: translate(-50%, -50%);
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+            z-index: 5;
+        }
+        .source-tag {
+            position: absolute;
+            bottom: 2px;
+            right: 5px;
+            font-size: 10px;
+            opacity: 0.8;
+        }
+        .section-label {
+            position: absolute;
+            font-size: 24px;
+            font-weight: bold;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+        }
+        .legends {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            border: 1px solid black;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 60%;
+            max-width: 600px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="tab">
+        <button class="tablink" onclick="openVisualization('sourceViz')">By Source</button>
+        <button class="tablink" onclick="openVisualization('clusterViz')">By Cluster</button>
+    </div>
+    
+    <div id="sourceViz" class="visualization">
+        <!-- Source visualization will be inserted here by JavaScript -->
+    </div>
+    
+    <div id="clusterViz" class="visualization">
+        <!-- Cluster visualization will be inserted here by JavaScript -->
+    </div>
+    
+    <!-- Modal for note details -->
+    <div id="noteModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle"></h3>
+            <p id="modalSource"></p>
+            <p id="modalCluster"></p>
+        </div>
+    </div>
+    
+    <script>
+        // Data placeholders - these will be replaced with actual data
+        const sourceNodes = [{"id": "interview_0", "label": "Healthcare Data Breach", "cluster": "Healthcare Security Vulnerabilities", "source": "Interview", "x": -648.1293932909974, "y": -399.39618996624966, "color": "#27a6a6"}, {"id": "interview_1", "label": "Healthcare Targeting Risk", "cluster": "Healthcare Security Vulnerabilities", "source": "Interview", "x": -556.1573178819643, "y": -379.9219176336783, "color": "#27a6a6"}, {"id": "interview_2", "label": "Digital Identity Infrastructure", "cluster": "Digital Infrastructure Challenges", "source": "Interview", "x": -611.9359354724975, "y": -389.60337219983114, "color": "#adbe30"}, {"id": "interview_3", "label": "Authentication System Weakness", "cluster": "Digital Infrastructure Challenges", "source": "Interview", "x": -589.5477064681826, "y": -360.5259703020022, "color": "#adbe30"}, {"id": "interview_4", "label": "Legacy System Dependence", "cluster": "Digital Infrastructure Challenges", "source": "Interview", "x": -633.6386310791808, "y": -368.95689336658165, "color": "#adbe30"}, {"id": "interview_5", "label": "Resource Limitation Impact", "cluster": "Digital Infrastructure Challenges", "source": "Interview", "x": -564.7569150025255, "y": -348.9955318698899, "color": "#adbe30"}, {"id": "interview_6", "label": "Digital Ecosystem Vulnerability", "cluster": "Digital Infrastructure Challenges", "source": "Interview", "x": -561.3484696483455, "y": -333.1399801620566, "color": "#adbe30"}, {"id": "interview_7", "label": "Utility Infrastructure Disruption", "cluster": "Critical Infrastructure Protection", "source": "Interview", "x": -637.7229913086468, "y": -319.9271396938712, "color": "#c09c2f"}, {"id": "interview_8", "label": "Democratic Process Vulnerability", "cluster": "Critical Infrastructure Protection", "source": "Interview", "x": -598.4842252266343, "y": -327.0718831239544, "color": "#c09c2f"}, {"id": "interview_9", "label": "Civilian Infrastructure Targeting", "cluster": "Critical Infrastructure Protection", "source": "Interview", "x": -551.9686155890237, "y": -315.5377306329702, "color": "#c09c2f"}, {"id": "interview_10", "label": "Combined Disruption Strategy", "cluster": "Advanced Attack Strategies", "source": "Interview", "x": -550.2984404494572, "y": -302.3206669366803, "color": "#b83030"}, {"id": "interview_11", "label": "Cyber-Physical Attack Coordination", "cluster": "Advanced Attack Strategies", "source": "Interview", "x": -569.4646745988505, "y": -290.0857827487467, "color": "#b83030"}, {"id": "interview_12", "label": "Advanced Persistence Techniques", "cluster": "Advanced Attack Strategies", "source": "Interview", "x": -579.4913764421423, "y": -288.0211254150642, "color": "#b83030"}, {"id": "interview_13", "label": "Social Engineering Vulnerability", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": -571.6673885322981, "y": -267.76484059874156, "color": "#a43bb3"}, {"id": "interview_14", "label": "Email-Based Threat Dominance", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": -648.7635542127006, "y": -268.14803660696793, "color": "#a43bb3"}, {"id": "interview_15", "label": "AI-Enhanced Phishing Evolution", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": -612.1012151196788, "y": -246.99305617580148, "color": "#a43bb3"}, {"id": "interview_16", "label": "Cultural Trust Exploitation", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": -615.7821358132164, "y": -234.33089411434418, "color": "#a43bb3"}, {"id": "interview_17", "label": "Naive Security Mindset", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": -644.9241568951518, "y": -225.05936263792964, "color": "#a43bb3"}, {"id": "interview_18", "label": "Human Security Weakness", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": -566.7553458106191, "y": -214.94228814653923, "color": "#a43bb3"}, {"id": "interview_19", "label": "User Behavior Risk", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": -559.1750232280771, "y": -204.54543308440404, "color": "#a43bb3"}, {"id": "interview_20", "label": "Social Engineering Prevalence", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": -553.7484155441788, "y": -188.9189908819771, "color": "#a43bb3"}, {"id": "interview_21", "label": "Generational Security Divide", "cluster": "Workforce and Expertise Challenges", "source": "Interview", "x": -595.6152435714262, "y": -181.56111180061146, "color": "#a4355e"}, {"id": "interview_22", "label": "Training Resource Constraint", "cluster": "Workforce and Expertise Challenges", "source": "Interview", "x": -609.3731236277267, "y": -184.76953477931292, "color": "#a4355e"}, {"id": "interview_23", "label": "Expertise Shortage Impact", "cluster": "Workforce and Expertise Challenges", "source": "Interview", "x": -648.3530384709171, "y": -169.21902171398327, "color": "#a4355e"}, {"id": "interview_24", "label": "Human Capital Investment Need", "cluster": "Workforce and Expertise Challenges", "source": "Interview", "x": -596.2523106574297, "y": -149.2461934182391, "color": "#a4355e"}, {"id": "interview_25", "label": "Incident Recovery Process", "cluster": "Incident Response and Recovery", "source": "Interview", "x": -550.8898460919478, "y": -141.45333688954952, "color": "#328bc0"}, {"id": "interview_26", "label": "Incident Response Coordination", "cluster": "Incident Response and Recovery", "source": "Interview", "x": -647.2527974360116, "y": -132.59777890107736, "color": "#328bc0"}, {"id": "interview_27", "label": "Parallel Response Methodology", "cluster": "Incident Response and Recovery", "source": "Interview", "x": -582.0341985836403, "y": -127.47106427922512, "color": "#328bc0"}, {"id": "interview_28", "label": "Low-Tech Contingency Planning", "cluster": "Incident Response and Recovery", "source": "Interview", "x": -640.8817650611256, "y": -125.82373791797005, "color": "#328bc0"}, {"id": "interview_29", "label": "Response Protocol Deficiency", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -572.1429747688038, "y": -98.92271103890847, "color": "#35aa7e"}, {"id": "interview_30", "label": "Decentralized System Vulnerability", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -612.7458804081687, "y": -89.08335188938233, "color": "#35aa7e"}, {"id": "interview_31", "label": "Historical Security Negligence", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -577.8253341948644, "y": -87.6558808318928, "color": "#35aa7e"}, {"id": "interview_32", "label": "Uncontrolled Technology Acquisition", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -627.1936595474447, "y": -77.4586119260733, "color": "#35aa7e"}, {"id": "interview_33", "label": "Governance Centralization Effort", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -575.0310628290669, "y": -62.393102757909524, "color": "#35aa7e"}, {"id": "interview_34", "label": "Security Function Evolution", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -640.6813216553259, "y": -48.0802832634072, "color": "#35aa7e"}, {"id": "interview_35", "label": "Regulatory Compliance Emphasis", "cluster": "Regulatory and Compliance Matters", "source": "Interview", "x": -614.200295207327, "y": -48.30678169163777, "color": "#7b39bd"}, {"id": "interview_36", "label": "False Security Perception", "cluster": "Regulatory and Compliance Matters", "source": "Interview", "x": -642.2684564778431, "y": -36.04363494953771, "color": "#7b39bd"}, {"id": "interview_37", "label": "Compliance-Efficiency Tradeoff", "cluster": "Regulatory and Compliance Matters", "source": "Interview", "x": -553.6428308368962, "y": -25.175410461978, "color": "#7b39bd"}, {"id": "interview_38", "label": "National Security Coordination", "cluster": "International Collaboration", "source": "Interview", "x": -586.3590749839213, "y": -5.427079458065609, "color": "#3f2db9"}, {"id": "interview_39", "label": "Threat Intelligence Sharing", "cluster": "International Collaboration", "source": "Interview", "x": -625.8300997903042, "y": -9.637286034959796, "color": "#3f2db9"}, {"id": "interview_40", "label": "Multi-Level Security Collaboration", "cluster": "International Collaboration", "source": "Interview", "x": -592.7178969907089, "y": 3.64842679465262, "color": "#3f2db9"}, {"id": "interview_41", "label": "Regional Defense Coalition", "cluster": "International Collaboration", "source": "Interview", "x": -576.2600871287233, "y": 14.882242745243932, "color": "#3f2db9"}, {"id": "interview_42", "label": "Public-Private Security Partnership", "cluster": "International Collaboration", "source": "Interview", "x": -600.135015045184, "y": 25.209275504757496, "color": "#3f2db9"}, {"id": "interview_43", "label": "Cross-Border Intelligence Sharing", "cluster": "International Collaboration", "source": "Interview", "x": -622.9259424914088, "y": 38.48053390361365, "color": "#3f2db9"}, {"id": "interview_44", "label": "Foreign Technology Reliance", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -639.2334176622753, "y": 53.58343784036465, "color": "#37a826"}, {"id": "interview_45", "label": "Technology Sovereignty Need", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -625.2709128662813, "y": 59.36251844695351, "color": "#37a826"}, {"id": "interview_46", "label": "Foreign Hardware Distrust", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -604.2926459270756, "y": 69.36935611080746, "color": "#37a826"}, {"id": "interview_47", "label": "Foreign AI Restriction", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -598.9213402319311, "y": 75.94370299805689, "color": "#37a826"}, {"id": "interview_48", "label": "Market Monopoly Vulnerability", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -633.938642858806, "y": 90.20316854072419, "color": "#37a826"}, {"id": "interview_49", "label": "Foreign Technology Restriction", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -574.2759665904996, "y": 90.49129059923375, "color": "#37a826"}, {"id": "interview_50", "label": "Foreign AI Data Extraction", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -590.6477992238438, "y": 98.428079305322, "color": "#37a826"}, {"id": "interview_51", "label": "Geopolitical Trust Shift", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -619.1047767651735, "y": 118.1133781139682, "color": "#3bb85a"}, {"id": "interview_52", "label": "Alliance Relationship Uncertainty", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -633.4150141941025, "y": 118.84786572503184, "color": "#3bb85a"}, {"id": "interview_53", "label": "International Relationship Deterioration", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -551.4278515321137, "y": 138.51103368302304, "color": "#3bb85a"}, {"id": "interview_54", "label": "International Collaboration Ban", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -642.3795858143417, "y": 145.83368539568244, "color": "#3bb85a"}, {"id": "interview_55", "label": "Geopolitical Instability Exploitation", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -586.9411465008701, "y": 152.97743344654046, "color": "#3bb85a"}, {"id": "interview_56", "label": "Cyber Warfare Definition", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -615.9039263848687, "y": 173.778081743532, "color": "#3bb85a"}, {"id": "interview_57", "label": "Threat Actor Hierarchy", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": -619.196137411878, "y": 185.77298212948418, "color": "#d625aa"}, {"id": "interview_58", "label": "Intellectual Property Targeting", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": -625.6616629625127, "y": 184.58708140697505, "color": "#d625aa"}, {"id": "interview_59", "label": "Long-Term Trust Infiltration", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": -631.0659747043142, "y": 206.28241089285032, "color": "#d625aa"}, {"id": "interview_60", "label": "Political Statement Retaliation", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": -649.405936921976, "y": 215.41865023138516, "color": "#d625aa"}, {"id": "interview_61", "label": "Economic Motivation Strategy", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": -581.2898438033012, "y": 220.57666640273374, "color": "#d625aa"}, {"id": "interview_62", "label": "State-Sponsored Threat Actors", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": -589.5983124071853, "y": 232.66711548180658, "color": "#d625aa"}, {"id": "interview_63", "label": "Russian Threat Primacy", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": -637.4918095397295, "y": 236.9661724723856, "color": "#d625aa"}, {"id": "interview_64", "label": "Persistent State Aggression", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": -603.8834900557927, "y": 238.85810794791422, "color": "#d625aa"}, {"id": "interview_65", "label": "Russian Cyber Capabilities", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": -553.1710655085653, "y": 251.1835969486562, "color": "#d625aa"}, {"id": "interview_66", "label": "Public Opinion Manipulation", "cluster": "Information Operations", "source": "Interview", "x": -589.3701985722133, "y": 274.5171936321425, "color": "#324fa6"}, {"id": "interview_67", "label": "Disinformation Campaign Evidence", "cluster": "Information Operations", "source": "Interview", "x": -567.687205928317, "y": 276.3257423280228, "color": "#324fa6"}, {"id": "interview_68", "label": "Geographic Access Restriction", "cluster": "Information Operations", "source": "Interview", "x": -596.0825203752019, "y": 281.1270246559611, "color": "#324fa6"}, {"id": "interview_69", "label": "Societal Impact Concern", "cluster": "Information Operations", "source": "Interview", "x": -598.0989001583422, "y": 296.2966953886278, "color": "#324fa6"}, {"id": "interview_70", "label": "AI Threat Anticipation", "cluster": "Emerging Technology Threats", "source": "Interview", "x": -579.8720092329754, "y": 307.20677693020883, "color": "#6da931"}, {"id": "interview_71", "label": "Quantum Cryptography Threat", "cluster": "Emerging Technology Threats", "source": "Interview", "x": -560.0257297657249, "y": 325.96520826793864, "color": "#6da931"}, {"id": "interview_72", "label": "Post-Quantum Transition Challenge", "cluster": "Emerging Technology Threats", "source": "Interview", "x": -582.8479253775, "y": 325.88528716585984, "color": "#6da931"}, {"id": "interview_73", "label": "Advanced Deepfake Capability", "cluster": "Emerging Technology Threats", "source": "Interview", "x": -624.873164916756, "y": 331.0589301409939, "color": "#6da931"}, {"id": "interview_74", "label": "AI Circumvention Potential", "cluster": "Emerging Technology Threats", "source": "Interview", "x": -591.2427478815104, "y": 359.2249616109423, "color": "#6da931"}, {"id": "interview_75", "label": "Biometric Defense Mechanism", "cluster": "Biometric Security Considerations", "source": "Interview", "x": -579.283205026988, "y": 362.7050532812788, "color": "#c3662e"}, {"id": "interview_76", "label": "Behavioral Biometric Authentication", "cluster": "Biometric Security Considerations", "source": "Interview", "x": -607.2373328110173, "y": 373.28247063576595, "color": "#c3662e"}, {"id": "interview_77", "label": "Biometric Spoofing Vulnerability", "cluster": "Biometric Security Considerations", "source": "Interview", "x": -628.164955887129, "y": 387.3070490518255, "color": "#c3662e"}, {"id": "interview_78", "label": "Neurobiological Identity Marker", "cluster": "Biometric Security Considerations", "source": "Interview", "x": -609.965208048033, "y": 386.0970379182262, "color": "#c3662e"}, {"id": "interview_79", "label": "Multi-Factor Biometric Security", "cluster": "Biometric Security Considerations", "source": "Interview", "x": -609.5049595538186, "y": 407.2220361715081, "color": "#c3662e"}, {"id": "survey_0", "label": "Medical Data Vulnerability", "cluster": "Healthcare Security Vulnerabilities", "source": "Survey", "x": 571.4542680119326, "y": -401.53098873910477, "color": "#27a6a6"}, {"id": "survey_1", "label": "Medical System Breach Example", "cluster": "Healthcare Security Vulnerabilities", "source": "Survey", "x": 590.5068370292365, "y": -371.19502369963215, "color": "#27a6a6"}, {"id": "survey_2", "label": "Ransomware Response Strategy", "cluster": "Healthcare Security Vulnerabilities", "source": "Survey", "x": 559.4624675158855, "y": -352.27449745865084, "color": "#27a6a6"}, {"id": "survey_3", "label": "Healthcare Impact Assessment", "cluster": "Healthcare Security Vulnerabilities", "source": "Survey", "x": 647.6866585096661, "y": -321.2925902174429, "color": "#27a6a6"}, {"id": "survey_4", "label": "Critical Infrastructure Targeting", "cluster": "Critical Infrastructure Protection", "source": "Survey", "x": 598.1788612218231, "y": -284.9735548636765, "color": "#c09c2f"}, {"id": "survey_5", "label": "Energy Sector Targeting", "cluster": "Critical Infrastructure Protection", "source": "Survey", "x": 584.6663492389404, "y": -253.47652029246746, "color": "#c09c2f"}, {"id": "survey_6", "label": "Combined Attack Strategy", "cluster": "Advanced Attack Strategies", "source": "Survey", "x": 559.9386616760411, "y": -226.7647461823267, "color": "#b83030"}, {"id": "survey_7", "label": "Tactics Evolution", "cluster": "Advanced Attack Strategies", "source": "Survey", "x": 581.6323567045923, "y": -203.44200800272128, "color": "#b83030"}, {"id": "survey_8", "label": "Combined Attack Approach", "cluster": "Advanced Attack Strategies", "source": "Survey", "x": 594.936692119562, "y": -179.73509465216353, "color": "#b83030"}, {"id": "survey_9", "label": "Attack Efficiency Characteristics", "cluster": "Advanced Attack Strategies", "source": "Survey", "x": 605.4871721120692, "y": -142.7631458205378, "color": "#b83030"}, {"id": "survey_10", "label": "Common Attack Methods", "cluster": "Advanced Attack Strategies", "source": "Survey", "x": 623.9718529100952, "y": -116.70321902230802, "color": "#b83030"}, {"id": "survey_11", "label": "Attack Vector Statistics", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Survey", "x": 619.7529557365857, "y": -90.66350412056241, "color": "#a43bb3"}, {"id": "survey_12", "label": "Workforce Challenge", "cluster": "Workforce and Expertise Challenges", "source": "Survey", "x": 581.2337723052989, "y": -55.66296716625578, "color": "#a4355e"}, {"id": "survey_13", "label": "Leadership Impact", "cluster": "Workforce and Expertise Challenges", "source": "Survey", "x": 589.4306674134905, "y": -37.17081090166335, "color": "#a4355e"}, {"id": "survey_14", "label": "Data Recovery Strategy", "cluster": "Incident Response and Recovery", "source": "Survey", "x": 564.5759291574203, "y": 3.564653972636906, "color": "#328bc0"}, {"id": "survey_15", "label": "Containment Strategy", "cluster": "Incident Response and Recovery", "source": "Survey", "x": 620.3518386297135, "y": 23.892533978179586, "color": "#328bc0"}, {"id": "survey_16", "label": "Resilience Mechanism", "cluster": "Incident Response and Recovery", "source": "Survey", "x": 602.2621138495455, "y": 67.00398196790417, "color": "#328bc0"}, {"id": "survey_17", "label": "Governance Recommendation", "cluster": "Governance and Strategic Planning", "source": "Survey", "x": 634.8981311749101, "y": 94.7122029473992, "color": "#35aa7e"}, {"id": "survey_18", "label": "Defense Strategy", "cluster": "Governance and Strategic Planning", "source": "Survey", "x": 614.2508333136697, "y": 113.55328298288497, "color": "#35aa7e"}, {"id": "survey_19", "label": "Best Practice Recommendation", "cluster": "Governance and Strategic Planning", "source": "Survey", "x": 622.6843902700379, "y": 140.50474708474954, "color": "#35aa7e"}, {"id": "survey_20", "label": "Security Strategy Effectiveness", "cluster": "Governance and Strategic Planning", "source": "Survey", "x": 566.338813475019, "y": 174.13200959533404, "color": "#35aa7e"}, {"id": "survey_21", "label": "Legal Framework Challenges", "cluster": "Regulatory and Compliance Matters", "source": "Survey", "x": 645.6747642739648, "y": 199.51508700681245, "color": "#7b39bd"}, {"id": "survey_22", "label": "International Assistance Value", "cluster": "International Collaboration", "source": "Survey", "x": 631.1514313405479, "y": 235.97483566200253, "color": "#3f2db9"}, {"id": "survey_23", "label": "Alliance Strengthening", "cluster": "International Collaboration", "source": "Survey", "x": 623.2258993282602, "y": 266.18228436116374, "color": "#3f2db9"}, {"id": "survey_24", "label": "Real-time Intelligence Sharing", "cluster": "International Collaboration", "source": "Survey", "x": 610.0358459948498, "y": 286.5337389496497, "color": "#3f2db9"}, {"id": "survey_25", "label": "Cross-border Healthcare Security", "cluster": "International Collaboration", "source": "Survey", "x": 560.2904660209352, "y": 311.31171273538155, "color": "#3f2db9"}, {"id": "survey_26", "label": "Collaborative Defense", "cluster": "International Collaboration", "source": "Survey", "x": 628.9623665303549, "y": 334.88954243708565, "color": "#3f2db9"}, {"id": "survey_27", "label": "Threat Intelligence Application", "cluster": "International Collaboration", "source": "Survey", "x": 643.8053123395592, "y": 370.4300644739574, "color": "#3f2db9"}, {"id": "survey_28", "label": "Information Warfare Objectives", "cluster": "Information Operations", "source": "Survey", "x": 611.0331453277583, "y": 390.1050602609399, "color": "#324fa6"}];
+        const clusterNodes = [{"id": "Advanced Attack Strategies_0", "label": "Combined Attack Strategy", "cluster": "Advanced Attack Strategies", "source": "Survey", "x": 750.0, "y": 0.0, "color": "#b83030"}, {"id": "Advanced Attack Strategies_1", "label": "Tactics Evolution", "cluster": "Advanced Attack Strategies", "source": "Survey", "x": 706.0660171779821, "y": 106.06601717798212, "color": "#b83030"}, {"id": "Advanced Attack Strategies_2", "label": "Combined Disruption Strategy", "cluster": "Advanced Attack Strategies", "source": "Interview", "x": 600.0, "y": 150.0, "color": "#b83030"}, {"id": "Advanced Attack Strategies_3", "label": "Cyber-Physical Attack Coordination", "cluster": "Advanced Attack Strategies", "source": "Interview", "x": 493.93398282201787, "y": 106.06601717798213, "color": "#b83030"}, {"id": "Advanced Attack Strategies_4", "label": "Advanced Persistence Techniques", "cluster": "Advanced Attack Strategies", "source": "Interview", "x": 450.0, "y": 1.8369701987210297e-14, "color": "#b83030"}, {"id": "Advanced Attack Strategies_5", "label": "Combined Attack Approach", "cluster": "Advanced Attack Strategies", "source": "Survey", "x": 493.93398282201787, "y": -106.06601717798212, "color": "#b83030"}, {"id": "Advanced Attack Strategies_6", "label": "Attack Efficiency Characteristics", "cluster": "Advanced Attack Strategies", "source": "Survey", "x": 600.0, "y": -150.0, "color": "#b83030"}, {"id": "Advanced Attack Strategies_7", "label": "Common Attack Methods", "cluster": "Advanced Attack Strategies", "source": "Survey", "x": 706.0660171779821, "y": -106.06601717798215, "color": "#b83030"}, {"id": "Biometric Security Considerations_0", "label": "Biometric Defense Mechanism", "cluster": "Biometric Security Considerations", "source": "Interview", "x": 704.327719506772, "y": 229.61005941905387, "color": "#c3662e"}, {"id": "Biometric Security Considerations_1", "label": "Behavioral Biometric Authentication", "cluster": "Biometric Security Considerations", "source": "Interview", "x": 600.6802686630142, "y": 372.26853686332686, "color": "#c3662e"}, {"id": "Biometric Security Considerations_2", "label": "Biometric Spoofing Vulnerability", "cluster": "Biometric Security Considerations", "source": "Interview", "x": 432.97517035052994, "y": 317.77784726292487, "color": "#c3662e"}, {"id": "Biometric Security Considerations_3", "label": "Neurobiological Identity Marker", "cluster": "Biometric Security Considerations", "source": "Interview", "x": 432.97517035052994, "y": 141.44227157518293, "color": "#c3662e"}, {"id": "Biometric Security Considerations_4", "label": "Multi-Factor Biometric Security", "cluster": "Biometric Security Considerations", "source": "Interview", "x": 600.6802686630141, "y": 86.95158197478082, "color": "#c3662e"}, {"id": "Critical Infrastructure Protection_0", "label": "Critical Infrastructure Targeting", "cluster": "Critical Infrastructure Protection", "source": "Survey", "x": 574.2640687119285, "y": 424.2640687119285, "color": "#c09c2f"}, {"id": "Critical Infrastructure Protection_1", "label": "Utility Infrastructure Disruption", "cluster": "Critical Infrastructure Protection", "source": "Interview", "x": 470.61661786817064, "y": 566.9225461562015, "color": "#c09c2f"}, {"id": "Critical Infrastructure Protection_2", "label": "Democratic Process Vulnerability", "cluster": "Critical Infrastructure Protection", "source": "Interview", "x": 302.9115195556864, "y": 512.4318565557994, "color": "#c09c2f"}, {"id": "Critical Infrastructure Protection_3", "label": "Energy Sector Targeting", "cluster": "Critical Infrastructure Protection", "source": "Survey", "x": 302.9115195556864, "y": 336.09628086805753, "color": "#c09c2f"}, {"id": "Critical Infrastructure Protection_4", "label": "Civilian Infrastructure Targeting", "cluster": "Critical Infrastructure Protection", "source": "Interview", "x": 470.61661786817064, "y": 281.6055912676554, "color": "#c09c2f"}, {"id": "Digital Infrastructure Challenges_0", "label": "Digital Identity Infrastructure", "cluster": "Digital Infrastructure Challenges", "source": "Interview", "x": 379.61005941905387, "y": 554.327719506772, "color": "#adbe30"}, {"id": "Digital Infrastructure Challenges_1", "label": "Authentication System Weakness", "cluster": "Digital Infrastructure Challenges", "source": "Interview", "x": 275.96260857529603, "y": 696.986196951045, "color": "#adbe30"}, {"id": "Digital Infrastructure Challenges_2", "label": "Legacy System Dependence", "cluster": "Digital Infrastructure Challenges", "source": "Interview", "x": 108.25751026281179, "y": 642.495507350643, "color": "#adbe30"}, {"id": "Digital Infrastructure Challenges_3", "label": "Resource Limitation Impact", "cluster": "Digital Infrastructure Challenges", "source": "Interview", "x": 108.25751026281178, "y": 466.1599316629011, "color": "#adbe30"}, {"id": "Digital Infrastructure Challenges_4", "label": "Digital Ecosystem Vulnerability", "cluster": "Digital Infrastructure Challenges", "source": "Interview", "x": 275.962608575296, "y": 411.669242062499, "color": "#adbe30"}, {"id": "Emerging Technology Threats_0", "label": "AI Threat Anticipation", "cluster": "Emerging Technology Threats", "source": "Interview", "x": 150.00000000000003, "y": 600.0, "color": "#6da931"}, {"id": "Emerging Technology Threats_1", "label": "Quantum Cryptography Threat", "cluster": "Emerging Technology Threats", "source": "Interview", "x": 46.352549156242155, "y": 742.658477444273, "color": "#6da931"}, {"id": "Emerging Technology Threats_2", "label": "Post-Quantum Transition Challenge", "cluster": "Emerging Technology Threats", "source": "Interview", "x": -121.35254915624206, "y": 688.167787843871, "color": "#6da931"}, {"id": "Emerging Technology Threats_3", "label": "Advanced Deepfake Capability", "cluster": "Emerging Technology Threats", "source": "Interview", "x": -121.35254915624208, "y": 511.83221215612906, "color": "#6da931"}, {"id": "Emerging Technology Threats_4", "label": "AI Circumvention Potential", "cluster": "Emerging Technology Threats", "source": "Interview", "x": 46.35254915624212, "y": 457.34152255572695, "color": "#6da931"}, {"id": "Foreign Technology Considerations_0", "label": "Foreign Technology Reliance", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -79.61005941905384, "y": 554.327719506772, "color": "#37a826"}, {"id": "Foreign Technology Considerations_1", "label": "Technology Sovereignty Need", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -136.0865891402438, "y": 671.6024418769765, "color": "#37a826"}, {"id": "Foreign Technology Considerations_2", "label": "Foreign Hardware Distrust", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -262.988199512501, "y": 700.5669063340456, "color": "#37a826"}, {"id": "Foreign Technology Considerations_3", "label": "Foreign AI Restriction", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -364.7553896044167, "y": 619.4102803744058, "color": "#37a826"}, {"id": "Foreign Technology Considerations_4", "label": "Market Monopoly Vulnerability", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -364.7553896044167, "y": 489.24515863913837, "color": "#37a826"}, {"id": "Foreign Technology Considerations_5", "label": "Foreign Technology Restriction", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -262.988199512501, "y": 408.0885326794985, "color": "#37a826"}, {"id": "Foreign Technology Considerations_6", "label": "Foreign AI Data Extraction", "cluster": "Foreign Technology Considerations", "source": "Interview", "x": -136.08658914024383, "y": 437.05299713656757, "color": "#37a826"}, {"id": "Geopolitical Security Dimensions_0", "label": "Geopolitical Trust Shift", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -274.2640687119285, "y": 424.26406871192853, "color": "#3bb85a"}, {"id": "Geopolitical Security Dimensions_1", "label": "Alliance Relationship Uncertainty", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -349.2640687119285, "y": 554.1678792795943, "color": "#3bb85a"}, {"id": "Geopolitical Security Dimensions_2", "label": "International Relationship Deterioration", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -499.2640687119284, "y": 554.1678792795943, "color": "#3bb85a"}, {"id": "Geopolitical Security Dimensions_3", "label": "International Collaboration Ban", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -574.2640687119285, "y": 424.26406871192853, "color": "#3bb85a"}, {"id": "Geopolitical Security Dimensions_4", "label": "Geopolitical Instability Exploitation", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -499.26406871192853, "y": 294.3602581442628, "color": "#3bb85a"}, {"id": "Geopolitical Security Dimensions_5", "label": "Cyber Warfare Definition", "cluster": "Geopolitical Security Dimensions", "source": "Interview", "x": -349.2640687119285, "y": 294.36025814426273, "color": "#3bb85a"}, {"id": "Governance and Strategic Planning_0", "label": "Response Protocol Deficiency", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -674.327719506772, "y": 154.61005941905393, "color": "#35aa7e"}, {"id": "Governance and Strategic Planning_1", "label": "Decentralized System Vulnerability", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -594.327719506772, "y": 154.61005941905393, "color": "#35aa7e"}, {"id": "Governance and Strategic Planning_2", "label": "Historical Security Negligence", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -514.327719506772, "y": 154.61005941905393, "color": "#35aa7e"}, {"id": "Governance and Strategic Planning_3", "label": "Uncontrolled Technology Acquisition", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -434.32771950677204, "y": 154.61005941905393, "color": "#35aa7e"}, {"id": "Governance and Strategic Planning_4", "label": "Governance Centralization Effort", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -674.327719506772, "y": 204.61005941905393, "color": "#35aa7e"}, {"id": "Governance and Strategic Planning_5", "label": "Security Function Evolution", "cluster": "Governance and Strategic Planning", "source": "Interview", "x": -594.327719506772, "y": 204.61005941905393, "color": "#35aa7e"}, {"id": "Governance and Strategic Planning_6", "label": "Governance Recommendation", "cluster": "Governance and Strategic Planning", "source": "Survey", "x": -514.327719506772, "y": 204.61005941905393, "color": "#35aa7e"}, {"id": "Governance and Strategic Planning_7", "label": "Defense Strategy", "cluster": "Governance and Strategic Planning", "source": "Survey", "x": -434.32771950677204, "y": 204.61005941905393, "color": "#35aa7e"}, {"id": "Governance and Strategic Planning_8", "label": "Best Practice Recommendation", "cluster": "Governance and Strategic Planning", "source": "Survey", "x": -674.327719506772, "y": 254.61005941905393, "color": "#35aa7e"}, {"id": "Governance and Strategic Planning_9", "label": "Security Strategy Effectiveness", "cluster": "Governance and Strategic Planning", "source": "Survey", "x": -594.327719506772, "y": 254.61005941905393, "color": "#35aa7e"}, {"id": "Healthcare Security Vulnerabilities_0", "label": "Medical Data Vulnerability", "cluster": "Healthcare Security Vulnerabilities", "source": "Survey", "x": -450.0, "y": 7.347880794884119e-14, "color": "#27a6a6"}, {"id": "Healthcare Security Vulnerabilities_1", "label": "Medical System Breach Example", "cluster": "Healthcare Security Vulnerabilities", "source": "Survey", "x": -525.0, "y": 129.9038105676659, "color": "#27a6a6"}, {"id": "Healthcare Security Vulnerabilities_2", "label": "Ransomware Response Strategy", "cluster": "Healthcare Security Vulnerabilities", "source": "Survey", "x": -675.0, "y": 129.9038105676659, "color": "#27a6a6"}, {"id": "Healthcare Security Vulnerabilities_3", "label": "Healthcare Data Breach", "cluster": "Healthcare Security Vulnerabilities", "source": "Interview", "x": -750.0, "y": 9.184850993605149e-14, "color": "#27a6a6"}, {"id": "Healthcare Security Vulnerabilities_4", "label": "Healthcare Targeting Risk", "cluster": "Healthcare Security Vulnerabilities", "source": "Interview", "x": -675.0000000000001, "y": -129.90381056766566, "color": "#27a6a6"}, {"id": "Healthcare Security Vulnerabilities_5", "label": "Healthcare Impact Assessment", "cluster": "Healthcare Security Vulnerabilities", "source": "Survey", "x": -525.0, "y": -129.90381056766572, "color": "#27a6a6"}, {"id": "Incident Response and Recovery_0", "label": "Incident Recovery Process", "cluster": "Incident Response and Recovery", "source": "Interview", "x": -404.32771950677216, "y": -229.6100594190538, "color": "#328bc0"}, {"id": "Incident Response and Recovery_1", "label": "Incident Response Coordination", "cluster": "Incident Response and Recovery", "source": "Interview", "x": -460.80424922796215, "y": -112.33533704884934, "color": "#328bc0"}, {"id": "Incident Response and Recovery_2", "label": "Parallel Response Methodology", "cluster": "Incident Response and Recovery", "source": "Interview", "x": -587.7058596002194, "y": -83.37087259178026, "color": "#328bc0"}, {"id": "Incident Response and Recovery_3", "label": "Low-Tech Contingency Planning", "cluster": "Incident Response and Recovery", "source": "Interview", "x": -689.473049692135, "y": -164.52749855142008, "color": "#328bc0"}, {"id": "Incident Response and Recovery_4", "label": "Data Recovery Strategy", "cluster": "Incident Response and Recovery", "source": "Survey", "x": -689.473049692135, "y": -294.69262028668754, "color": "#328bc0"}, {"id": "Incident Response and Recovery_5", "label": "Containment Strategy", "cluster": "Incident Response and Recovery", "source": "Survey", "x": -587.7058596002194, "y": -375.84924624632737, "color": "#328bc0"}, {"id": "Incident Response and Recovery_6", "label": "Resilience Mechanism", "cluster": "Incident Response and Recovery", "source": "Survey", "x": -460.80424922796215, "y": -346.8847817892583, "color": "#328bc0"}, {"id": "Information Operations_0", "label": "Public Opinion Manipulation", "cluster": "Information Operations", "source": "Interview", "x": -274.2640687119286, "y": -424.2640687119285, "color": "#324fa6"}, {"id": "Information Operations_1", "label": "Disinformation Campaign Evidence", "cluster": "Information Operations", "source": "Interview", "x": -377.9115195556865, "y": -281.6055912676554, "color": "#324fa6"}, {"id": "Information Operations_2", "label": "Geographic Access Restriction", "cluster": "Information Operations", "source": "Interview", "x": -545.6166178681707, "y": -336.0962808680575, "color": "#324fa6"}, {"id": "Information Operations_3", "label": "Information Warfare Objectives", "cluster": "Information Operations", "source": "Survey", "x": -545.6166178681707, "y": -512.4318565557994, "color": "#324fa6"}, {"id": "Information Operations_4", "label": "Societal Impact Concern", "cluster": "Information Operations", "source": "Interview", "x": -377.9115195556865, "y": -566.9225461562015, "color": "#324fa6"}, {"id": "International Collaboration_0", "label": "National Security Coordination", "cluster": "International Collaboration", "source": "Interview", "x": -349.6100594190542, "y": -629.3277195067719, "color": "#3f2db9"}, {"id": "International Collaboration_1", "label": "Threat Intelligence Sharing", "cluster": "International Collaboration", "source": "Interview", "x": -269.6100594190542, "y": -629.3277195067719, "color": "#3f2db9"}, {"id": "International Collaboration_2", "label": "Multi-Level Security Collaboration", "cluster": "International Collaboration", "source": "Interview", "x": -189.6100594190542, "y": -629.3277195067719, "color": "#3f2db9"}, {"id": "International Collaboration_3", "label": "Regional Defense Coalition", "cluster": "International Collaboration", "source": "Interview", "x": -109.61005941905421, "y": -629.3277195067719, "color": "#3f2db9"}, {"id": "International Collaboration_4", "label": "Public-Private Security Partnership", "cluster": "International Collaboration", "source": "Interview", "x": -349.6100594190542, "y": -579.3277195067719, "color": "#3f2db9"}, {"id": "International Collaboration_5", "label": "Cross-Border Intelligence Sharing", "cluster": "International Collaboration", "source": "Interview", "x": -269.6100594190542, "y": -579.3277195067719, "color": "#3f2db9"}, {"id": "International Collaboration_6", "label": "International Assistance Value", "cluster": "International Collaboration", "source": "Survey", "x": -189.6100594190542, "y": -579.3277195067719, "color": "#3f2db9"}, {"id": "International Collaboration_7", "label": "Alliance Strengthening", "cluster": "International Collaboration", "source": "Survey", "x": -109.61005941905421, "y": -579.3277195067719, "color": "#3f2db9"}, {"id": "International Collaboration_8", "label": "Real-time Intelligence Sharing", "cluster": "International Collaboration", "source": "Survey", "x": -349.6100594190542, "y": -529.3277195067719, "color": "#3f2db9"}, {"id": "International Collaboration_9", "label": "Cross-border Healthcare Security", "cluster": "International Collaboration", "source": "Survey", "x": -269.6100594190542, "y": -529.3277195067719, "color": "#3f2db9"}, {"id": "International Collaboration_10", "label": "Collaborative Defense", "cluster": "International Collaboration", "source": "Survey", "x": -189.6100594190542, "y": -529.3277195067719, "color": "#3f2db9"}, {"id": "International Collaboration_11", "label": "Threat Intelligence Application", "cluster": "International Collaboration", "source": "Survey", "x": -109.61005941905421, "y": -529.3277195067719, "color": "#3f2db9"}, {"id": "Regulatory and Compliance Matters_0", "label": "Regulatory Compliance Emphasis", "cluster": "Regulatory and Compliance Matters", "source": "Interview", "x": 149.9999999999999, "y": -600.0, "color": "#7b39bd"}, {"id": "Regulatory and Compliance Matters_1", "label": "False Security Perception", "cluster": "Regulatory and Compliance Matters", "source": "Interview", "x": -1.0103336092965664e-13, "y": -450.0, "color": "#7b39bd"}, {"id": "Regulatory and Compliance Matters_2", "label": "Compliance-Efficiency Tradeoff", "cluster": "Regulatory and Compliance Matters", "source": "Interview", "x": -150.0000000000001, "y": -600.0, "color": "#7b39bd"}, {"id": "Regulatory and Compliance Matters_3", "label": "Legal Framework Challenges", "cluster": "Regulatory and Compliance Matters", "source": "Survey", "x": -1.3777276490407722e-13, "y": -750.0, "color": "#7b39bd"}, {"id": "Social Engineering and Human Vulnerabilities_0", "label": "Social Engineering Vulnerability", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": 149.610059419054, "y": -604.3277195067719, "color": "#a43bb3"}, {"id": "Social Engineering and Human Vulnerabilities_1", "label": "Email-Based Threat Dominance", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": 229.610059419054, "y": -604.3277195067719, "color": "#a43bb3"}, {"id": "Social Engineering and Human Vulnerabilities_2", "label": "AI-Enhanced Phishing Evolution", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": 309.610059419054, "y": -604.3277195067719, "color": "#a43bb3"}, {"id": "Social Engineering and Human Vulnerabilities_3", "label": "Cultural Trust Exploitation", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": 149.610059419054, "y": -554.3277195067719, "color": "#a43bb3"}, {"id": "Social Engineering and Human Vulnerabilities_4", "label": "Naive Security Mindset", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": 229.610059419054, "y": -554.3277195067719, "color": "#a43bb3"}, {"id": "Social Engineering and Human Vulnerabilities_5", "label": "Human Security Weakness", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": 309.610059419054, "y": -554.3277195067719, "color": "#a43bb3"}, {"id": "Social Engineering and Human Vulnerabilities_6", "label": "User Behavior Risk", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": 149.610059419054, "y": -504.3277195067719, "color": "#a43bb3"}, {"id": "Social Engineering and Human Vulnerabilities_7", "label": "Attack Vector Statistics", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Survey", "x": 229.610059419054, "y": -504.3277195067719, "color": "#a43bb3"}, {"id": "Social Engineering and Human Vulnerabilities_8", "label": "Social Engineering Prevalence", "cluster": "Social Engineering and Human Vulnerabilities", "source": "Interview", "x": 309.610059419054, "y": -504.3277195067719, "color": "#a43bb3"}, {"id": "State-Sponsored Threat Actors_0", "label": "Threat Actor Hierarchy", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": 344.2640687119284, "y": -474.2640687119286, "color": "#d625aa"}, {"id": "State-Sponsored Threat Actors_1", "label": "Intellectual Property Targeting", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": 424.2640687119284, "y": -474.2640687119286, "color": "#d625aa"}, {"id": "State-Sponsored Threat Actors_2", "label": "Long-Term Trust Infiltration", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": 504.2640687119284, "y": -474.2640687119286, "color": "#d625aa"}, {"id": "State-Sponsored Threat Actors_3", "label": "Political Statement Retaliation", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": 344.2640687119284, "y": -424.2640687119286, "color": "#d625aa"}, {"id": "State-Sponsored Threat Actors_4", "label": "Economic Motivation Strategy", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": 424.2640687119284, "y": -424.2640687119286, "color": "#d625aa"}, {"id": "State-Sponsored Threat Actors_5", "label": "State-Sponsored Threat Actors", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": 504.2640687119284, "y": -424.2640687119286, "color": "#d625aa"}, {"id": "State-Sponsored Threat Actors_6", "label": "Russian Threat Primacy", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": 344.2640687119284, "y": -374.2640687119286, "color": "#d625aa"}, {"id": "State-Sponsored Threat Actors_7", "label": "Persistent State Aggression", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": 424.2640687119284, "y": -374.2640687119286, "color": "#d625aa"}, {"id": "State-Sponsored Threat Actors_8", "label": "Russian Cyber Capabilities", "cluster": "State-Sponsored Threat Actors", "source": "Interview", "x": 504.2640687119284, "y": -374.2640687119286, "color": "#d625aa"}, {"id": "Workforce and Expertise Challenges_0", "label": "Generational Security Divide", "cluster": "Workforce and Expertise Challenges", "source": "Interview", "x": 704.3277195067719, "y": -229.61005941905424, "color": "#a4355e"}, {"id": "Workforce and Expertise Challenges_1", "label": "Training Resource Constraint", "cluster": "Workforce and Expertise Challenges", "source": "Interview", "x": 629.3277195067719, "y": -99.70624885138844, "color": "#a4355e"}, {"id": "Workforce and Expertise Challenges_2", "label": "Expertise Shortage Impact", "cluster": "Workforce and Expertise Challenges", "source": "Interview", "x": 479.3277195067719, "y": -99.70624885138844, "color": "#a4355e"}, {"id": "Workforce and Expertise Challenges_3", "label": "Human Capital Investment Need", "cluster": "Workforce and Expertise Challenges", "source": "Interview", "x": 404.3277195067719, "y": -229.6100594190542, "color": "#a4355e"}, {"id": "Workforce and Expertise Challenges_4", "label": "Workforce Challenge", "cluster": "Workforce and Expertise Challenges", "source": "Survey", "x": 479.32771950677187, "y": -359.51386998672, "color": "#a4355e"}, {"id": "Workforce and Expertise Challenges_5", "label": "Leadership Impact", "cluster": "Workforce and Expertise Challenges", "source": "Survey", "x": 629.3277195067719, "y": -359.51386998672, "color": "#a4355e"}];
+        const clusterLabels = [{"id": "label_Advanced Attack Strategies", "label": "Advanced Attack Strategies", "x": 600.0, "y": 0.0, "color": "#b83030", "isLabel": true}, {"id": "label_Biometric Security Considerations", "label": "Biometric Security Considerations", "x": 554.327719506772, "y": 229.61005941905387, "color": "#c3662e", "isLabel": true}, {"id": "label_Critical Infrastructure Protection", "label": "Critical Infrastructure Protection", "x": 424.26406871192853, "y": 424.2640687119285, "color": "#c09c2f", "isLabel": true}, {"id": "label_Digital Infrastructure Challenges", "label": "Digital Infrastructure Challenges", "x": 229.6100594190539, "y": 554.327719506772, "color": "#adbe30", "isLabel": true}, {"id": "label_Emerging Technology Threats", "label": "Emerging Technology Threats", "x": 3.6739403974420595e-14, "y": 600.0, "color": "#6da931", "isLabel": true}, {"id": "label_Foreign Technology Considerations", "label": "Foreign Technology Considerations", "x": -229.61005941905384, "y": 554.327719506772, "color": "#37a826", "isLabel": true}, {"id": "label_Geopolitical Security Dimensions", "label": "Geopolitical Security Dimensions", "x": -424.2640687119285, "y": 424.26406871192853, "color": "#3bb85a", "isLabel": true}, {"id": "label_Governance and Strategic Planning", "label": "Governance and Strategic Planning", "x": -554.327719506772, "y": 229.61005941905393, "color": "#35aa7e", "isLabel": true}, {"id": "label_Healthcare Security Vulnerabilities", "label": "Healthcare Security Vulnerabilities", "x": -600.0, "y": 7.347880794884119e-14, "color": "#27a6a6", "isLabel": true}, {"id": "label_Incident Response and Recovery", "label": "Incident Response and Recovery", "x": -554.3277195067722, "y": -229.6100594190538, "color": "#328bc0", "isLabel": true}, {"id": "label_Information Operations", "label": "Information Operations", "x": -424.2640687119286, "y": -424.2640687119285, "color": "#324fa6", "isLabel": true}, {"id": "label_International Collaboration", "label": "International Collaboration", "x": -229.6100594190542, "y": -554.3277195067719, "color": "#3f2db9", "isLabel": true}, {"id": "label_Regulatory and Compliance Matters", "label": "Regulatory and Compliance Matters", "x": -1.1021821192326178e-13, "y": -600.0, "color": "#7b39bd", "isLabel": true}, {"id": "label_Social Engineering and Human Vulnerabilities", "label": "Social Engineering and Human Vulnerabilities", "x": 229.610059419054, "y": -554.3277195067719, "color": "#a43bb3", "isLabel": true}, {"id": "label_State-Sponsored Threat Actors", "label": "State-Sponsored Threat Actors", "x": 424.2640687119284, "y": -424.2640687119286, "color": "#d625aa", "isLabel": true}, {"id": "label_Workforce and Expertise Challenges", "label": "Workforce and Expertise Challenges", "x": 554.3277195067719, "y": -229.61005941905424, "color": "#a4355e", "isLabel": true}];
+        const clusters = ["Advanced Attack Strategies", "Biometric Security Considerations", "Critical Infrastructure Protection", "Digital Infrastructure Challenges", "Emerging Technology Threats", "Foreign Technology Considerations", "Geopolitical Security Dimensions", "Governance and Strategic Planning", "Healthcare Security Vulnerabilities", "Incident Response and Recovery", "Information Operations", "International Collaboration", "Regulatory and Compliance Matters", "Social Engineering and Human Vulnerabilities", "State-Sponsored Threat Actors", "Workforce and Expertise Challenges"];
+        const clusterColors = {"Advanced Attack Strategies": "#b83030", "Biometric Security Considerations": "#c3662e", "Critical Infrastructure Protection": "#c09c2f", "Digital Infrastructure Challenges": "#adbe30", "Emerging Technology Threats": "#6da931", "Foreign Technology Considerations": "#37a826", "Geopolitical Security Dimensions": "#3bb85a", "Governance and Strategic Planning": "#35aa7e", "Healthcare Security Vulnerabilities": "#27a6a6", "Incident Response and Recovery": "#328bc0", "Information Operations": "#324fa6", "International Collaboration": "#3f2db9", "Regulatory and Compliance Matters": "#7b39bd", "Social Engineering and Human Vulnerabilities": "#a43bb3", "State-Sponsored Threat Actors": "#d625aa", "Workforce and Expertise Challenges": "#a4355e"};
+        
+        // Function to check if two notes overlap
+        function notesOverlap(note1Pos, note2Pos, noteWidth, noteHeight) {
+            // Add buffer space between notes
+            const buffer = 10;
+            const adjustedWidth = noteWidth + buffer;
+            const adjustedHeight = noteHeight + buffer;
+            
+            return (
+                Math.abs(note1Pos.x - note2Pos.x) < adjustedWidth &&
+                Math.abs(note1Pos.y - note2Pos.y) < adjustedHeight
+            );
+        }
+
+        // Function to adjust positions to avoid overlaps
+        function adjustPositions(nodes, noteWidth, noteHeight) {
+            const positions = [];
+            
+            for (let i = 0; i < nodes.length; i++) {
+                let node = nodes[i];
+                let pos = { x: node.x, y: node.y };
+                let iterations = 0;
+                let overlapping = true;
+                
+                // Maximum iterations to prevent infinite loops
+                const maxIterations = 50;
+                
+                // Keep adjusting position until no overlap or max iterations reached
+                while (overlapping && iterations < maxIterations) {
+                    overlapping = false;
+                    
+                    // Check if current position overlaps with any existing positions
+                    for (let j = 0; j < positions.length; j++) {
+                        if (notesOverlap(pos, positions[j], noteWidth, noteHeight)) {
+                            overlapping = true;
+                            
+                            // Adjust position - try moving in different directions
+                            const direction = iterations % 4;
+                            const distance = 20 + (5 * Math.floor(iterations / 4));
+                            
+                            switch (direction) {
+                                case 0: pos.x += distance; break; // Move right
+                                case 1: pos.y += distance; break; // Move down
+                                case 2: pos.x -= distance; break; // Move left
+                                case 3: pos.y -= distance; break; // Move up
+                            }
+                            
+                            iterations++;
+                            break;
+                        }
+                    }
+                }
+                
+                // Store the final position
+                positions.push(pos);
+                
+                // Update the node position
+                nodes[i].x = pos.x;
+                nodes[i].y = pos.y;
+            }
+            
+            return nodes;
+        }
+
+        // Set up the source visualization
+        function setupSourceVisualization() {
+            const container = document.getElementById('sourceViz');
+            
+            // Clear existing content if any
+            container.innerHTML = '';
+            
+            // Add section labels
+            const interviewLabel = document.createElement('div');
+            interviewLabel.className = 'section-label';
+            interviewLabel.textContent = 'INTERVIEW';
+            interviewLabel.style.left = '25%';
+            interviewLabel.style.top = '100px';
+            container.appendChild(interviewLabel);
+            
+            const surveyLabel = document.createElement('div');
+            surveyLabel.className = 'section-label';
+            surveyLabel.textContent = 'SURVEY';
+            surveyLabel.style.left = '75%';
+            surveyLabel.style.top = '100px';
+            container.appendChild(surveyLabel);
+            
+            // Define note dimensions
+            const noteWidth = 180;
+            const noteHeight = 40;
+            
+            // Separate interview and survey nodes
+            const interviewNodes = sourceNodes.filter(node => node.source === 'Interview');
+            const surveyNodes = sourceNodes.filter(node => node.source === 'Survey');
+            
+            // Adjust positions to avoid overlaps (using deep copies to avoid modifying originals)
+            const adjustedInterviewNodes = adjustPositions(
+                interviewNodes.map(node => ({...node})), 
+                noteWidth, 
+                noteHeight
+            );
+            
+            const adjustedSurveyNodes = adjustPositions(
+                surveyNodes.map(node => ({...node})), 
+                noteWidth, 
+                noteHeight
+            );
+            
+            // Combine adjusted nodes
+            const adjustedNodes = [...adjustedInterviewNodes, ...adjustedSurveyNodes];
+            
+            // Add sticky notes
+            adjustedNodes.forEach(node => {
+                const note = document.createElement('div');
+                note.className = 'sticky-note';
+                note.textContent = node.label;
+                note.style.left = (node.x + window.innerWidth/2) + 'px';
+                note.style.top = (node.y + window.innerHeight/2) + 'px';
+                note.style.backgroundColor = node.color;
+                note.style.borderColor = node.source === 'Interview' ? 'black' : 'darkgray';
+                note.style.opacity = node.source === 'Interview' ? '0.8' : '0.6';
+                note.dataset.id = node.id;
+                
+                // Add source tag
+                const sourceTag = document.createElement('span');
+                sourceTag.className = 'source-tag';
+                sourceTag.textContent = node.source === 'Interview' ? 'I' : 'S';
+                note.appendChild(sourceTag);
+                
+                // Make notes draggable
+                note.setAttribute('draggable', true);
+                note.addEventListener('dragstart', function(e) {
+                    e.dataTransfer.setData('text/plain', node.id);
+                    this.style.opacity = '0.4';
+                });
+                note.addEventListener('dragend', function(e) {
+                    this.style.opacity = node.source === 'Interview' ? '0.8' : '0.6';
+                });
+                
+                // Add click event for detail view
+                note.addEventListener('click', function() {
+                    showNoteDetails(node);
+                });
+                
+                container.appendChild(note);
+            });
+            
+            // Add legends
+            const legends = document.createElement('div');
+            legends.className = 'legends';
+            
+            // Create source legends
+            const sourceLegendTitle = document.createElement('h4');
+            sourceLegendTitle.textContent = 'Sources:';
+            sourceLegendTitle.style.margin = '5px 0';
+            legends.appendChild(sourceLegendTitle);
+            
+            const interviewLegend = document.createElement('div');
+            interviewLegend.className = 'legend-item';
+            interviewLegend.innerHTML = '<div class="legend-color" style="background-color: rgba(0,0,0,0.1); border: 2px solid black;"></div>Interview (I)';
+            legends.appendChild(interviewLegend);
+            
+            const surveyLegend = document.createElement('div');
+            surveyLegend.className = 'legend-item';
+            surveyLegend.innerHTML = '<div class="legend-color" style="background-color: rgba(0,0,0,0.1); border: 2px solid darkgray;"></div>Survey (S)';
+            legends.appendChild(surveyLegend);
+            
+            // Create cluster legends
+            const clusterLegendTitle = document.createElement('h4');
+            clusterLegendTitle.textContent = 'Clusters:';
+            clusterLegendTitle.style.margin = '10px 0 5px 0';
+            legends.appendChild(clusterLegendTitle);
+            
+            Object.entries(clusterColors).forEach(([cluster, color]) => {
+                const clusterLegend = document.createElement('div');
+                clusterLegend.className = 'legend-item';
+                clusterLegend.innerHTML = `<div class="legend-color" style="background-color: ${color};"></div>${cluster}`;
+                legends.appendChild(clusterLegend);
+            });
+            
+            container.appendChild(legends);
+        }
+
+        // Set up the cluster visualization
+        function setupClusterVisualization() {
+            const container = document.getElementById('clusterViz');
+            
+            // Clear existing content if any
+            container.innerHTML = '';
+            
+            // Add cluster labels
+            clusterLabels.forEach(label => {
+                const clusterLabel = document.createElement('div');
+                clusterLabel.className = 'cluster-label';
+                clusterLabel.textContent = label.label;
+                clusterLabel.style.left = (label.x + window.innerWidth/2) + 'px';
+                clusterLabel.style.top = (label.y + window.innerHeight/2) + 'px';
+                clusterLabel.style.borderColor = label.color;
+                container.appendChild(clusterLabel);
+            });
+            
+            // Define note dimensions
+            const noteWidth = 180;
+            const noteHeight = 40;
+            
+            // Group nodes by cluster for better positioning
+            const clusterGroups = {};
+            clusterNodes.forEach(node => {
+                if (!clusterGroups[node.cluster]) {
+                    clusterGroups[node.cluster] = [];
+                }
+                clusterGroups[node.cluster].push({...node});  // Use a copy to avoid modifying original
+            });
+            
+            // Adjust positions within each cluster
+            const adjustedNodes = [];
+            Object.values(clusterGroups).forEach(groupNodes => {
+                adjustedNodes.push(...adjustPositions(groupNodes, noteWidth, noteHeight));
+            });
+            
+            // Add sticky notes
+            adjustedNodes.forEach(node => {
+                const note = document.createElement('div');
+                note.className = 'sticky-note';
+                note.textContent = node.label;
+                note.style.left = (node.x + window.innerWidth/2) + 'px';
+                note.style.top = (node.y + window.innerHeight/2) + 'px';
+                note.style.backgroundColor = node.color;
+                note.style.borderColor = node.source === 'Interview' ? 'black' : 'darkgray';
+                note.style.opacity = node.source === 'Interview' ? '0.8' : '0.6';
+                note.dataset.id = node.id;
+                
+                // Add source tag
+                const sourceTag = document.createElement('span');
+                sourceTag.className = 'source-tag';
+                sourceTag.textContent = node.source === 'Interview' ? 'I' : 'S';
+                note.appendChild(sourceTag);
+                
+                // Make notes draggable
+                note.setAttribute('draggable', true);
+                note.addEventListener('dragstart', function(e) {
+                    e.dataTransfer.setData('text/plain', node.id);
+                    this.style.opacity = '0.4';
+                });
+                note.addEventListener('dragend', function(e) {
+                    this.style.opacity = node.source === 'Interview' ? '0.8' : '0.6';
+                });
+                
+                // Add click event for detail view
+                note.addEventListener('click', function() {
+                    showNoteDetails(node);
+                });
+                
+                container.appendChild(note);
+            });
+            
+            // Add legends (same as source viz)
+            const legends = document.createElement('div');
+            legends.className = 'legends';
+            
+            // Create source legends
+            const sourceLegendTitle = document.createElement('h4');
+            sourceLegendTitle.textContent = 'Sources:';
+            sourceLegendTitle.style.margin = '5px 0';
+            legends.appendChild(sourceLegendTitle);
+            
+            const interviewLegend = document.createElement('div');
+            interviewLegend.className = 'legend-item';
+            interviewLegend.innerHTML = '<div class="legend-color" style="background-color: rgba(0,0,0,0.1); border: 2px solid black;"></div>Interview (I)';
+            legends.appendChild(interviewLegend);
+            
+            const surveyLegend = document.createElement('div');
+            surveyLegend.className = 'legend-item';
+            surveyLegend.innerHTML = '<div class="legend-color" style="background-color: rgba(0,0,0,0.1); border: 2px solid darkgray;"></div>Survey (S)';
+            legends.appendChild(surveyLegend);
+            
+            container.appendChild(legends);
+        }
+        
+        // Function to show note details in a modal
+        function showNoteDetails(node) {
+            const modal = document.getElementById('noteModal');
+            document.getElementById('modalTitle').textContent = node.label;
+            document.getElementById('modalSource').textContent = `Source: ${node.source}`;
+            document.getElementById('modalCluster').textContent = `Cluster: ${node.cluster}`;
+            modal.style.display = 'block';
+        }
+        
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById('noteModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('noteModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Function to open visualizations
+        function openVisualization(vizName) {
+            // Hide all visualizations
+            const visualizations = document.getElementsByClassName('visualization');
+            for(let i = 0; i < visualizations.length; i++) {
+                visualizations[i].style.display = 'none';
+            }
+            
+            // Show the selected visualization
+            document.getElementById(vizName).style.display = 'block';
+            
+            // Update active tab
+            const tabs = document.getElementsByClassName('tablink');
+            for(let i = 0; i < tabs.length; i++) {
+                tabs[i].className = tabs[i].className.replace(' active', '');
+            }
+            
+            event.currentTarget.className += ' active';
+            
+            // Initialize the visualization if needed
+            if(vizName === 'sourceViz') {
+                setupSourceVisualization();
+            } else if(vizName === 'clusterViz') {
+                setupClusterVisualization();
+            }
+        }
+        
+        // Initialize
+        window.onload = function() {
+            openVisualization('sourceViz');
+            document.getElementsByClassName('tablink')[0].className += ' active';
+        };
+    </script>
+</body>
+</html>
+    

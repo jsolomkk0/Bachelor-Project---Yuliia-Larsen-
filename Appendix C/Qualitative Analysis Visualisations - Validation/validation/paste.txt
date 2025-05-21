@@ -1,0 +1,160 @@
+
+\begin{longtable}{|p{0.5\textwidth}|p{0.2\textwidth}|p{0.3\textwidth}|}
+\hline
+\textbf{Code} & \textbf{Participants} & \textbf{Theme} \\
+\hline
+\endhead
+
+Digital Vulnerability & PV3 & Digital Security Challenges \\
+\hline
+Security Awareness Gap & PV3 & Human Factor in Security \\
+\hline
+Systemic Fragility & PV1 & System Vulnerabilities \\
+\hline
+Security Complexity & PV1 & Digital Security Challenges \\
+\hline
+Evolving Warfare & PV2 & Hybrid Warfare Dynamics \\
+\hline
+Technology in Warfare & PV2 & Hybrid Warfare Dynamics \\
+\hline
+Digital Economy & PV3 & Critical Infrastructure \\
+\hline
+Digital Efficiency & PV3 & Critical Infrastructure \\
+\hline
+Critical Infrastructure & PV3 & Critical Infrastructure \\
+\hline
+Infrastructure Governance & PV3 & Critical Infrastructure \\
+\hline
+Target Selection & PV2 & Hybrid Warfare Tactics \\
+\hline
+Defense Limitations & PV2 & Defensive Capabilities \\
+\hline
+Centralization Risk & PV1 & System Vulnerabilities \\
+\hline
+Centralization Dilemma & PV1 & System Vulnerabilities \\
+\hline
+Security Trade-offs & PV1, PV3 & Security Implementation \\
+\hline
+Threat Escalation & PV3 & Threat Evolution \\
+\hline
+Attack Inevitability & PV3 & Threat Evolution \\
+\hline
+Cyber-First Strategy & PV2 & Hybrid Warfare Tactics \\
+\hline
+Hybrid Warfare Sequence & PV2 & Hybrid Warfare Dynamics \\
+\hline
+System Redundancy & PV1 & Resilience Strategies \\
+\hline
+Legacy System Loss & PV1 & System Vulnerabilities \\
+\hline
+Human Factor & PV3 & Human Factor in Security \\
+\hline
+Security Behavior & PV3 & Human Factor in Security \\
+\hline
+Awareness Deficit & PV3 & Human Factor in Security \\
+\hline
+Civilian Involvement & PV2 & Societal Resilience \\
+\hline
+Preparedness Effect & PV2 & Societal Resilience \\
+\hline
+Trust Limitations & PV1 & Trust and Information Sharing \\
+\hline
+Information Silos & PV1 & Trust and Information Sharing \\
+\hline
+Crisis Trust & PV1 & Trust and Information Sharing \\
+\hline
+Incident Planning & PV3 & Preparedness and Response \\
+\hline
+Scenario Testing & PV3 & Preparedness and Response \\
+\hline
+Emergency Preparation & PV3 & Preparedness and Response \\
+\hline
+System Resilience & PV2 & Resilience Strategies \\
+\hline
+Tactical Vulnerability & PV2 & Defensive Capabilities \\
+\hline
+System Redundancy & PV1 & Resilience Strategies \\
+\hline
+Cost of Security & PV1 & Security Implementation \\
+\hline
+Personal Resilience & PV1 & Societal Resilience \\
+\hline
+Security Framework & PV3 & Security Implementation \\
+\hline
+Expertise Gap & PV3 & Knowledge and Expertise \\
+\hline
+Response Framework & PV2 & Preparedness and Response \\
+\hline
+Holistic Preparedness & PV2 & Preparedness and Response \\
+\hline
+Information Access & PV1 & Trust and Information Sharing \\
+\hline
+Security Innovation & PV1 & Security Implementation \\
+\hline
+Data Sovereignty & PV3 & Digital Sovereignty \\
+\hline
+Foreign Dependency & PV3 & Digital Sovereignty \\
+\hline
+Trust Erosion & PV3 & Trust and Information Sharing \\
+\hline
+Technological Dependency & PV2 & Digital Sovereignty \\
+\hline
+European Autonomy & PV2 & Digital Sovereignty \\
+\hline
+Technology Transition & PV1 & Digital Sovereignty \\
+\hline
+Shifting Trust & PV1 & Trust and Information Sharing \\
+\hline
+Digital Sovereignty & PV1 & Digital Sovereignty \\
+\hline
+Transition Challenges & PV1 & Digital Sovereignty \\
+\hline
+Threat Actors & PV2 & Threat Landscape \\
+\hline
+Threat Prioritization & PV2 & Threat Landscape \\
+\hline
+Threat Assessment & PV1 & Threat Landscape \\
+\hline
+Russian Threat & PV1 & Threat Landscape \\
+\hline
+Primary Threats & PV3 & Threat Landscape \\
+\hline
+Knowledge Transfer & PV3 & Knowledge and Expertise \\
+\hline
+Ukrainian Expertise & PV3, PV1 & Knowledge and Expertise \\
+\hline
+European Security & PV2 & International Cooperation \\
+\hline
+Security Realignment & PV2 & International Cooperation \\
+\hline
+Cautious Cooperation & PV1 & International Cooperation \\
+\hline
+Dependency Concerns & PV1 & International Cooperation \\
+\hline
+Small Nation Strategy & PV1 & International Cooperation \\
+\hline
+Attribution Challenge & PV2 & Attribution and Response \\
+\hline
+Undisclosed Attacks & PV2 & Attribution and Response \\
+\hline
+Cyber Countermeasures & PV2 & Attribution and Response \\
+\hline
+Russian Attribution & PV3 & Attribution and Response \\
+\hline
+Security Paradigm Shift & PV2 & Future Security Landscape \\
+\hline
+Heightened Risk & PV2 & Future Security Landscape \\
+\hline
+Future Uncertainty & PV2 & Future Security Landscape \\
+\hline
+Continuous Threat & PV2 & Future Security Landscape \\
+\hline
+Dynamic Landscape & PV3 & Future Security Landscape \\
+\hline
+Security Arms Race & PV3 & Future Security Landscape \\
+\hline
+Geopolitical Awareness & PV3 & International Cooperation \\
+\hline
+Dependency Recognition & PV3 & Digital Sovereignty \\
+\hline
+\end{longtable}

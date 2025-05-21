@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cybersecurity Research Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        #visualization { position: relative; width: 100%; height: 800px; background-color: white; border: 1px solid #ddd; border-radius: 5px; }
+        .controls { margin-bottom: 20px; }
+        button { padding: 8px 16px; margin-right: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .node { cursor: pointer; }
+        .link { stroke-opacity: 0.6; }
+        .label { font-size: 12px; pointer-events: none; }
+        .theme-label { font-weight: bold; font-size: 14px; }
+        .tooltip { position: absolute; background-color: white; padding: 8px; border: 1px solid #ddd; border-radius: 4px; pointer-events: none; opacity: 0; }
+    </style>
+</head>
+<body>
+    <h1>Cybersecurity Research Visualization</h1>
+    <div class="controls">
+        <button id="themeBtn" onclick="switchToThemeView()">Theme-centric View</button>
+        <button id="participantBtn" onclick="switchToParticipantView()">Participant-centric View</button>
+        <button id="resetBtn" onclick="resetVisualization()">Reset</button>
+    </div>
+    <div id="visualization"></div>
+    <div class="tooltip" id="tooltip"></div>
+    
+    <script>
+    // Data loading and visualization
+    const width = document.getElementById('visualization').clientWidth;
+    const height = document.getElementById('visualization').clientHeight;
+    const svg = d3.select('#visualization')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+        
+    const tooltip = d3.select('#tooltip');
+    
+    // Load the data
+    const data = {
+        nodes: [],
+        links: []
+    };
+    
+    const themeData = [{"name": "Digital Sovereignty", "count": 8, "color": "#c7c7c7"}, {"name": "Future Security Landscape", "count": 6, "color": "#9edae5"}, {"name": "International Cooperation", "count": 6, "color": "#dbdb8d"}, {"name": "Trust and Information Sharing", "count": 6, "color": "#e377c2"}, {"name": "Preparedness and Response", "count": 5, "color": "#f7b6d2"}, {"name": "Threat Landscape", "count": 5, "color": "#bcbd22"}, {"name": "System Vulnerabilities", "count": 4, "color": "#ff7f0e"}, {"name": "Attribution and Response", "count": 4, "color": "#17becf"}, {"name": "Critical Infrastructure", "count": 4, "color": "#2ca02c"}, {"name": "Security Implementation", "count": 4, "color": "#ff9896"}, {"name": "Human Factor in Security", "count": 4, "color": "#aec7e8"}, {"name": "Knowledge and Expertise", "count": 3, "color": "#7f7f7f"}, {"name": "Resilience Strategies", "count": 3, "color": "#8c564b"}, {"name": "Societal Resilience", "count": 3, "color": "#c49c94"}, {"name": "Hybrid Warfare Dynamics", "count": 3, "color": "#ffbb78"}, {"name": "Threat Evolution", "count": 2, "color": "#9467bd"}, {"name": "Defensive Capabilities", "count": 2, "color": "#d62728"}, {"name": "Hybrid Warfare Tactics", "count": 2, "color": "#98df8a"}, {"name": "Digital Security Challenges", "count": 2, "color": "#1f77b4"}];
+    const codeData = [{"name": "Digital Vulnerability", "theme": "Digital Security Challenges", "participants": ["PV3"]}, {"name": "Security Awareness Gap", "theme": "Human Factor in Security", "participants": ["PV3"]}, {"name": "Systemic Fragility", "theme": "System Vulnerabilities", "participants": ["PV1"]}, {"name": "Security Complexity", "theme": "Digital Security Challenges", "participants": ["PV1"]}, {"name": "Evolving Warfare", "theme": "Hybrid Warfare Dynamics", "participants": ["PV2"]}, {"name": "Technology in Warfare", "theme": "Hybrid Warfare Dynamics", "participants": ["PV2"]}, {"name": "Digital Economy", "theme": "Critical Infrastructure", "participants": ["PV3"]}, {"name": "Digital Efficiency", "theme": "Critical Infrastructure", "participants": ["PV3"]}, {"name": "Critical Infrastructure", "theme": "Critical Infrastructure", "participants": ["PV3"]}, {"name": "Infrastructure Governance", "theme": "Critical Infrastructure", "participants": ["PV3"]}, {"name": "Target Selection", "theme": "Hybrid Warfare Tactics", "participants": ["PV2"]}, {"name": "Defense Limitations", "theme": "Defensive Capabilities", "participants": ["PV2"]}, {"name": "Centralization Risk", "theme": "System Vulnerabilities", "participants": ["PV1"]}, {"name": "Centralization Dilemma", "theme": "System Vulnerabilities", "participants": ["PV1"]}, {"name": "Security Trade-offs", "theme": "Security Implementation", "participants": ["PV1", "PV3"]}, {"name": "Threat Escalation", "theme": "Threat Evolution", "participants": ["PV3"]}, {"name": "Attack Inevitability", "theme": "Threat Evolution", "participants": ["PV3"]}, {"name": "Cyber-First Strategy", "theme": "Hybrid Warfare Tactics", "participants": ["PV2"]}, {"name": "Hybrid Warfare Sequence", "theme": "Hybrid Warfare Dynamics", "participants": ["PV2"]}, {"name": "System Redundancy", "theme": "Resilience Strategies", "participants": ["PV1"]}, {"name": "Legacy System Loss", "theme": "System Vulnerabilities", "participants": ["PV1"]}, {"name": "Human Factor", "theme": "Human Factor in Security", "participants": ["PV3"]}, {"name": "Security Behavior", "theme": "Human Factor in Security", "participants": ["PV3"]}, {"name": "Awareness Deficit", "theme": "Human Factor in Security", "participants": ["PV3"]}, {"name": "Civilian Involvement", "theme": "Societal Resilience", "participants": ["PV2"]}, {"name": "Preparedness Effect", "theme": "Societal Resilience", "participants": ["PV2"]}, {"name": "Trust Limitations", "theme": "Trust and Information Sharing", "participants": ["PV1"]}, {"name": "Information Silos", "theme": "Trust and Information Sharing", "participants": ["PV1"]}, {"name": "Crisis Trust", "theme": "Trust and Information Sharing", "participants": ["PV1"]}, {"name": "Incident Planning", "theme": "Preparedness and Response", "participants": ["PV3"]}, {"name": "Scenario Testing", "theme": "Preparedness and Response", "participants": ["PV3"]}, {"name": "Emergency Preparation", "theme": "Preparedness and Response", "participants": ["PV3"]}, {"name": "System Resilience", "theme": "Resilience Strategies", "participants": ["PV2"]}, {"name": "Tactical Vulnerability", "theme": "Defensive Capabilities", "participants": ["PV2"]}, {"name": "System Redundancy", "theme": "Resilience Strategies", "participants": ["PV1"]}, {"name": "Cost of Security", "theme": "Security Implementation", "participants": ["PV1"]}, {"name": "Personal Resilience", "theme": "Societal Resilience", "participants": ["PV1"]}, {"name": "Security Framework", "theme": "Security Implementation", "participants": ["PV3"]}, {"name": "Expertise Gap", "theme": "Knowledge and Expertise", "participants": ["PV3"]}, {"name": "Response Framework", "theme": "Preparedness and Response", "participants": ["PV2"]}, {"name": "Holistic Preparedness", "theme": "Preparedness and Response", "participants": ["PV2"]}, {"name": "Information Access", "theme": "Trust and Information Sharing", "participants": ["PV1"]}, {"name": "Security Innovation", "theme": "Security Implementation", "participants": ["PV1"]}, {"name": "Data Sovereignty", "theme": "Digital Sovereignty", "participants": ["PV3"]}, {"name": "Foreign Dependency", "theme": "Digital Sovereignty", "participants": ["PV3"]}, {"name": "Trust Erosion", "theme": "Trust and Information Sharing", "participants": ["PV3"]}, {"name": "Technological Dependency", "theme": "Digital Sovereignty", "participants": ["PV2"]}, {"name": "European Autonomy", "theme": "Digital Sovereignty", "participants": ["PV2"]}, {"name": "Technology Transition", "theme": "Digital Sovereignty", "participants": ["PV1"]}, {"name": "Shifting Trust", "theme": "Trust and Information Sharing", "participants": ["PV1"]}, {"name": "Digital Sovereignty", "theme": "Digital Sovereignty", "participants": ["PV1"]}, {"name": "Transition Challenges", "theme": "Digital Sovereignty", "participants": ["PV1"]}, {"name": "Threat Actors", "theme": "Threat Landscape", "participants": ["PV2"]}, {"name": "Threat Prioritization", "theme": "Threat Landscape", "participants": ["PV2"]}, {"name": "Threat Assessment", "theme": "Threat Landscape", "participants": ["PV1"]}, {"name": "Russian Threat", "theme": "Threat Landscape", "participants": ["PV1"]}, {"name": "Primary Threats", "theme": "Threat Landscape", "participants": ["PV3"]}, {"name": "Knowledge Transfer", "theme": "Knowledge and Expertise", "participants": ["PV3"]}, {"name": "Ukrainian Expertise", "theme": "Knowledge and Expertise", "participants": ["PV3", "PV1"]}, {"name": "European Security", "theme": "International Cooperation", "participants": ["PV2"]}, {"name": "Security Realignment", "theme": "International Cooperation", "participants": ["PV2"]}, {"name": "Cautious Cooperation", "theme": "International Cooperation", "participants": ["PV1"]}, {"name": "Dependency Concerns", "theme": "International Cooperation", "participants": ["PV1"]}, {"name": "Small Nation Strategy", "theme": "International Cooperation", "participants": ["PV1"]}, {"name": "Attribution Challenge", "theme": "Attribution and Response", "participants": ["PV2"]}, {"name": "Undisclosed Attacks", "theme": "Attribution and Response", "participants": ["PV2"]}, {"name": "Cyber Countermeasures", "theme": "Attribution and Response", "participants": ["PV2"]}, {"name": "Russian Attribution", "theme": "Attribution and Response", "participants": ["PV3"]}, {"name": "Security Paradigm Shift", "theme": "Future Security Landscape", "participants": ["PV2"]}, {"name": "Heightened Risk", "theme": "Future Security Landscape", "participants": ["PV2"]}, {"name": "Future Uncertainty", "theme": "Future Security Landscape", "participants": ["PV2"]}, {"name": "Continuous Threat", "theme": "Future Security Landscape", "participants": ["PV2"]}, {"name": "Dynamic Landscape", "theme": "Future Security Landscape", "participants": ["PV3"]}, {"name": "Security Arms Race", "theme": "Future Security Landscape", "participants": ["PV3"]}, {"name": "Geopolitical Awareness", "theme": "International Cooperation", "participants": ["PV3"]}, {"name": "Dependency Recognition", "theme": "Digital Sovereignty", "participants": ["PV3"]}];
+    const participantData = [{"name": "PV3", "count": 26}, {"name": "PV2", "count": 25}, {"name": "PV1", "count": 23}, {"name": "PV1, PV3", "count": 1}, {"name": "PV3, PV1", "count": 1}];
+    
+    // Create nodes for themes
+    themeData.forEach(theme => {
+        data.nodes.push({
+            id: 'theme-' + theme.name,
+            name: theme.name,
+            type: 'theme',
+            count: theme.count,
+            color: theme.color
+        });
+    });
+    
+    // Create nodes for codes
+    codeData.forEach(code => {
+        data.nodes.push({
+            id: 'code-' + code.name,
+            name: code.name,
+            type: 'code',
+            theme: code.theme,
+            participants: code.participants
+        });
+    });
+    
+    // Create nodes for participants
+    participantData.forEach(participant => {
+        data.nodes.push({
+            id: 'participant-' + participant.name,
+            name: participant.name,
+            type: 'participant',
+            count: participant.count
+        });
+    });
+    
+    // Create links between themes and codes
+    codeData.forEach(code => {
+        data.links.push({
+            source: 'code-' + code.name,
+            target: 'theme-' + code.theme,
+            type: 'code-theme'
+        });
+    });
+    
+    // Create links between codes and participants
+    codeData.forEach(code => {
+        code.participants.forEach(participant => {
+            data.links.push({
+                source: 'code-' + code.name,
+                target: 'participant-' + participant,
+                type: 'code-participant'
+            });
+        });
+    });
+    
+    // Force simulation
+    const simulation = d3.forceSimulation(data.nodes)
+        .force('link', d3.forceLink(data.links).id(d => d.id).distance(100))
+        .force('charge', d3.forceManyBody().strength(-300))
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('collision', d3.forceCollide().radius(d => getNodeRadius(d) + 5));
+    
+    // Draw links
+    const link = svg.append('g')
+        .selectAll('line')
+        .data(data.links)
+        .enter()
+        .append('line')
+        .attr('class', 'link')
+        .attr('stroke', d => getLinkColor(d))
+        .attr('stroke-width', d => getLinkWidth(d));
+    
+    // Draw nodes
+    const node = svg.append('g')
+        .selectAll('.node')
+        .data(data.nodes)
+        .enter()
+        .append('g')
+        .attr('class', 'node')
+        .call(d3.drag()
+            .on('start', dragstarted)
+            .on('drag', dragged)
+            .on('end', dragended))
+        .on('mouseover', showTooltip)
+        .on('mouseout', hideTooltip)
+        .on('click', handleNodeClick);
+    
+    // Add circles to nodes
+    node.append('circle')
+        .attr('r', d => getNodeRadius(d))
+        .attr('fill', d => getNodeColor(d))
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 2);
+    
+    // Add labels to nodes
+    node.append('text')
+        .attr('class', d => d.type === 'theme' ? 'label theme-label' : 'label')
+        .attr('dx', d => getNodeRadius(d) + 5)
+        .attr('dy', '.35em')
+        .text(d => d.name);
+    
+    // Update force simulation
+    simulation.on('tick', () => {
+        link
+            .attr('x1', d => d.source.x)
+            .attr('y1', d => d.source.y)
+            .attr('x2', d => d.target.x)
+            .attr('y2', d => d.target.y);
+        
+        node.attr('transform', d => `translate(${d.x},${d.y})`);
+    });
+    
+    // Helper functions
+    function getNodeRadius(d) {
+        if (d.type === 'theme') return 15 + d.count * 2;
+        if (d.type === 'participant') return 12 + d.count;
+        return 8;
+    }
+    
+    function getNodeColor(d) {
+        if (d.type === 'theme') return d.color;
+        if (d.type === 'code') {
+            const theme = themeData.find(t => t.name === d.theme);
+            return theme ? theme.color : '#999';
+        }
+        return '#3498db';
+    }
+    
+    function getLinkColor(d) {
+        if (d.type === 'code-theme') {
+            const theme = themeData.find(t => t.name === d.target.name);
+            return theme ? theme.color : '#999';
+        }
+        return '#999';
+    }
+    
+    function getLinkWidth(d) {
+        if (d.type === 'code-theme') return 2;
+        return 1;
+    }
+    
+    function showTooltip(event, d) {
+        let content = '';
+        
+        if (d.type === 'theme') {
+            content = `<strong>${d.name}</strong><br>Codes: ${d.count}`;
+        } else if (d.type === 'code') {
+            content = `<strong>${d.name}</strong><br>Theme: ${d.theme}<br>Participants: ${d.participants.join(', ')}`;
+        } else if (d.type === 'participant') {
+            content = `<strong>${d.name}</strong><br>Codes: ${d.count}`;
+        }
+        
+        tooltip.html(content)
+            .style('left', (event.pageX + 10) + 'px')
+            .style('top', (event.pageY - 10) + 'px')
+            .style('opacity', 0.9);
+    }
+    
+    function hideTooltip() {
+        tooltip.style('opacity', 0);
+    }
+    
+    function dragstarted(event) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+    }
+    
+    function dragged(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+    }
+    
+    function dragended(event) {
+        if (!event.active) simulation.alphaTarget(0);
+        event.subject.fx = null;
+        event.subject.fy = null;
+    }
+    
+    function switchToThemeView() {
+        simulation.stop();
+        
+        // Position themes in a circle
+        const themeNodes = data.nodes.filter(d => d.type === 'theme');
+        const numThemes = themeNodes.length;
+        const themeRadius = Math.min(width, height) * 0.35;
+        
+        themeNodes.forEach((node, i) => {
+            const angle = (i / numThemes) * 2 * Math.PI;
+            node.fx = width/2 + themeRadius * Math.cos(angle);
+            node.fy = height/2 + themeRadius * Math.sin(angle);
+        });
+        
+        // Reset other node positions
+        data.nodes.filter(d => d.type !== 'theme').forEach(node => {
+            node.fx = null;
+            node.fy = null;
+        });
+        
+        simulation.alpha(1).restart();
+    }
+    
+    function switchToParticipantView() {
+    simulation.stop();
+    
+    // Position participants in a circle
+    const participantNodes = data.nodes.filter(d => d.type === 'participant');
+    const numParticipants = participantNodes.length;
+    const participantRadius = Math.min(width, height) * 0.35;
+    
+    participantNodes.forEach((node, i) => {
+        const angle = (i / numParticipants) * 2 * Math.PI;
+        node.fx = width/2 + participantRadius * Math.cos(angle);
+        node.fy = height/2 + participantRadius * Math.sin(angle);
+    });
+    
+    // Reset other node positions
+    data.nodes.filter(d => d.type !== 'participant').forEach(node => {
+        node.fx = null;
+        node.fy = null;
+    });
+    
+    simulation.alpha(1).restart();
+}
+
+function resetVisualization() {
+    // Clear fixed positions for all nodes
+    data.nodes.forEach(node => {
+        node.fx = null;
+        node.fy = null;
+    });
+    
+    // Restart simulation
+    simulation.alpha(1).restart();
+}
+
+function handleNodeClick(event, d) {
+    // Stop event propagation
+    event.stopPropagation();
+    
+    // Highlight connections for clicked node
+    if (d.type === 'theme') {
+        highlightThemeConnections(d);
+    } else if (d.type === 'participant') {
+        highlightParticipantConnections(d);
+    } else if (d.type === 'code') {
+        highlightCodeConnections(d);
+    }
+}
+
+function highlightThemeConnections(themeNode) {
+    // Reset all opacities
+    link.attr('stroke-opacity', 0.2);
+    node.attr('opacity', 0.2);
+    
+    // Highlight the theme node
+    node.filter(n => n.id === themeNode.id)
+        .attr('opacity', 1);
+    
+    // Find all codes for this theme
+    const connectedCodes = data.links
+        .filter(l => l.target.id === themeNode.id)
+        .map(l => l.source.id);
+    
+    // Highlight connected codes
+    node.filter(n => connectedCodes.includes(n.id))
+        .attr('opacity', 1);
+    
+    // Highlight theme-code links
+    link.filter(l => l.target.id === themeNode.id)
+        .attr('stroke-opacity', 0.8);
+}
+
+function highlightParticipantConnections(participantNode) {
+    // Reset all opacities
+    link.attr('stroke-opacity', 0.2);
+    node.attr('opacity', 0.2);
+    
+    // Highlight the participant node
+    node.filter(n => n.id === participantNode.id)
+        .attr('opacity', 1);
+    
+    // Find all codes for this participant
+    const connectedCodes = data.links
+        .filter(l => l.target.id === participantNode.id)
+        .map(l => l.source.id);
+    
+    // Highlight connected codes
+    node.filter(n => connectedCodes.includes(n.id))
+        .attr('opacity', 1);
+    
+    // Find themes for these codes
+    const connectedThemes = data.links
+        .filter(l => connectedCodes.includes(l.source.id) && l.type === 'code-theme')
+        .map(l => l.target.id);
+    
+    // Highlight connected themes
+    node.filter(n => connectedThemes.includes(n.id))
+        .attr('opacity', 1);
+    
+    // Highlight participant-code links
+    link.filter(l => l.target.id === participantNode.id)
+        .attr('stroke-opacity', 0.8);
+    
+    // Highlight code-theme links for connected codes
+    link.filter(l => connectedCodes.includes(l.source.id) && l.type === 'code-theme')
+        .attr('stroke-opacity', 0.8);
+}
+
+function highlightCodeConnections(codeNode) {
+    // Reset all opacities
+    link.attr('stroke-opacity', 0.2);
+    node.attr('opacity', 0.2);
+    
+    // Highlight the code node
+    node.filter(n => n.id === codeNode.id)
+        .attr('opacity', 1);
+    
+    // Find theme for this code
+    const connectedTheme = data.links
+        .filter(l => l.source.id === codeNode.id && l.type === 'code-theme')
+        .map(l => l.target.id)[0];
+    
+    // Find participants for this code
+    const connectedParticipants = data.links
+        .filter(l => l.source.id === codeNode.id && l.type === 'code-participant')
+        .map(l => l.target.id);
+    
+    // Highlight connected theme
+    node.filter(n => n.id === connectedTheme)
+        .attr('opacity', 1);
+    
+    // Highlight connected participants
+    node.filter(n => connectedParticipants.includes(n.id))
+        .attr('opacity', 1);
+    
+    // Highlight all links for this code
+    link.filter(l => l.source.id === codeNode.id)
+        .attr('stroke-opacity', 0.8);
+}
+
+// Initialize with theme-centric view
+switchToThemeView();
+</script>
+</body>
+</html>

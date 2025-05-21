@@ -1,0 +1,110 @@
+Pattern Label,Source,Cluster
+Medical Data Vulnerability,Survey,Healthcare Security Vulnerabilities
+Medical System Breach Example,Survey,Healthcare Security Vulnerabilities
+Ransomware Response Strategy,Survey,Healthcare Security Vulnerabilities
+Healthcare Data Breach,Interview,Healthcare Security Vulnerabilities
+Healthcare Targeting Risk,Interview,Healthcare Security Vulnerabilities
+Healthcare Impact Assessment,Survey,Healthcare Security Vulnerabilities
+Digital Identity Infrastructure,Interview,Digital Infrastructure Challenges
+Authentication System Weakness,Interview,Digital Infrastructure Challenges
+Legacy System Dependence,Interview,Digital Infrastructure Challenges
+Resource Limitation Impact,Interview,Digital Infrastructure Challenges
+Digital Ecosystem Vulnerability,Interview,Digital Infrastructure Challenges
+Critical Infrastructure Targeting,Survey,Critical Infrastructure Protection
+Utility Infrastructure Disruption,Interview,Critical Infrastructure Protection
+Democratic Process Vulnerability,Interview,Critical Infrastructure Protection
+Energy Sector Targeting,Survey,Critical Infrastructure Protection
+Civilian Infrastructure Targeting,Interview,Critical Infrastructure Protection
+Combined Attack Strategy,Survey,Advanced Attack Strategies
+Tactics Evolution,Survey,Advanced Attack Strategies
+Combined Disruption Strategy,Interview,Advanced Attack Strategies
+Cyber-Physical Attack Coordination,Interview,Advanced Attack Strategies
+Advanced Persistence Techniques,Interview,Advanced Attack Strategies
+Combined Attack Approach,Survey,Advanced Attack Strategies
+Attack Efficiency Characteristics,Survey,Advanced Attack Strategies
+Common Attack Methods,Survey,Advanced Attack Strategies
+Social Engineering Vulnerability,Interview,Social Engineering and Human Vulnerabilities
+Email-Based Threat Dominance,Interview,Social Engineering and Human Vulnerabilities
+AI-Enhanced Phishing Evolution,Interview,Social Engineering and Human Vulnerabilities
+Cultural Trust Exploitation,Interview,Social Engineering and Human Vulnerabilities
+Naive Security Mindset,Interview,Social Engineering and Human Vulnerabilities
+Human Security Weakness,Interview,Social Engineering and Human Vulnerabilities
+User Behavior Risk,Interview,Social Engineering and Human Vulnerabilities
+Attack Vector Statistics,Survey,Social Engineering and Human Vulnerabilities
+Social Engineering Prevalence,Interview,Social Engineering and Human Vulnerabilities
+Generational Security Divide,Interview,Workforce and Expertise Challenges
+Training Resource Constraint,Interview,Workforce and Expertise Challenges
+Expertise Shortage Impact,Interview,Workforce and Expertise Challenges
+Human Capital Investment Need,Interview,Workforce and Expertise Challenges
+Workforce Challenge,Survey,Workforce and Expertise Challenges
+Leadership Impact,Survey,Workforce and Expertise Challenges
+Incident Recovery Process,Interview,Incident Response and Recovery
+Incident Response Coordination,Interview,Incident Response and Recovery
+Parallel Response Methodology,Interview,Incident Response and Recovery
+Low-Tech Contingency Planning,Interview,Incident Response and Recovery
+Data Recovery Strategy,Survey,Incident Response and Recovery
+Containment Strategy,Survey,Incident Response and Recovery
+Resilience Mechanism,Survey,Incident Response and Recovery
+Response Protocol Deficiency,Interview,Governance and Strategic Planning
+Decentralized System Vulnerability,Interview,Governance and Strategic Planning
+Historical Security Negligence,Interview,Governance and Strategic Planning
+Uncontrolled Technology Acquisition,Interview,Governance and Strategic Planning
+Governance Centralization Effort,Interview,Governance and Strategic Planning
+Security Function Evolution,Interview,Governance and Strategic Planning
+Governance Recommendation,Survey,Governance and Strategic Planning
+Defense Strategy,Survey,Governance and Strategic Planning
+Best Practice Recommendation,Survey,Governance and Strategic Planning
+Security Strategy Effectiveness,Survey,Governance and Strategic Planning
+Regulatory Compliance Emphasis,Interview,Regulatory and Compliance Matters
+False Security Perception,Interview,Regulatory and Compliance Matters
+Compliance-Efficiency Tradeoff,Interview,Regulatory and Compliance Matters
+Legal Framework Challenges,Survey,Regulatory and Compliance Matters
+National Security Coordination,Interview,International Collaboration
+Threat Intelligence Sharing,Interview,International Collaboration
+Multi-Level Security Collaboration,Interview,International Collaboration
+Regional Defense Coalition,Interview,International Collaboration
+Public-Private Security Partnership,Interview,International Collaboration
+Cross-Border Intelligence Sharing,Interview,International Collaboration
+International Assistance Value,Survey,International Collaboration
+Alliance Strengthening,Survey,International Collaboration
+Real-time Intelligence Sharing,Survey,International Collaboration
+Cross-border Healthcare Security,Survey,International Collaboration
+Collaborative Defense,Survey,International Collaboration
+Threat Intelligence Application,Survey,International Collaboration
+Foreign Technology Reliance,Interview,Foreign Technology Considerations
+Technology Sovereignty Need,Interview,Foreign Technology Considerations
+Foreign Hardware Distrust,Interview,Foreign Technology Considerations
+Foreign AI Restriction,Interview,Foreign Technology Considerations
+Market Monopoly Vulnerability,Interview,Foreign Technology Considerations
+Foreign Technology Restriction,Interview,Foreign Technology Considerations
+Foreign AI Data Extraction,Interview,Foreign Technology Considerations
+Geopolitical Trust Shift,Interview,Geopolitical Security Dimensions
+Alliance Relationship Uncertainty,Interview,Geopolitical Security Dimensions
+International Relationship Deterioration,Interview,Geopolitical Security Dimensions
+International Collaboration Ban,Interview,Geopolitical Security Dimensions
+Geopolitical Instability Exploitation,Interview,Geopolitical Security Dimensions
+Cyber Warfare Definition,Interview,Geopolitical Security Dimensions
+Threat Actor Hierarchy,Interview,State-Sponsored Threat Actors
+Intellectual Property Targeting,Interview,State-Sponsored Threat Actors
+Long-Term Trust Infiltration,Interview,State-Sponsored Threat Actors
+Political Statement Retaliation,Interview,State-Sponsored Threat Actors
+Economic Motivation Strategy,Interview,State-Sponsored Threat Actors
+State-Sponsored Threat Actors,Interview,State-Sponsored Threat Actors
+Russian Threat Primacy,Interview,State-Sponsored Threat Actors
+Persistent State Aggression,Interview,State-Sponsored Threat Actors
+Russian Cyber Capabilities,Interview,State-Sponsored Threat Actors
+Public Opinion Manipulation,Interview,Information Operations
+Disinformation Campaign Evidence,Interview,Information Operations
+Geographic Access Restriction,Interview,Information Operations
+Information Warfare Objectives,Survey,Information Operations
+Societal Impact Concern,Interview,Information Operations
+AI Threat Anticipation,Interview,Emerging Technology Threats
+Quantum Cryptography Threat,Interview,Emerging Technology Threats
+Post-Quantum Transition Challenge,Interview,Emerging Technology Threats
+Advanced Deepfake Capability,Interview,Emerging Technology Threats
+AI Circumvention Potential,Interview,Emerging Technology Threats
+Biometric Defense Mechanism,Interview,Biometric Security Considerations
+Behavioral Biometric Authentication,Interview,Biometric Security Considerations
+Biometric Spoofing Vulnerability,Interview,Biometric Security Considerations
+Neurobiological Identity Marker,Interview,Biometric Security Considerations
+Multi-Factor Biometric Security,Interview,Biometric Security Considerations
